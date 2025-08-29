@@ -14,17 +14,22 @@ document.addEventListener('DOMContentLoaded', () => {
     function addMessage(sender, message, isTemporary = false) {
         const messageElement = document.createElement('div');
         messageElement.classList.add('chat-message', sender);
+
+        const bubble = document.createElement('div');
+        bubble.classList.add('bubble');
         if (sender === 'bot') {
-            messageElement.innerHTML = formatMessageText(message);
+            bubble.innerHTML = formatMessageText(message);
         } else {
-            messageElement.textContent = message;
+            bubble.textContent = message;
         }
+        messageElement.appendChild(bubble);
+
         if (isTemporary) {
             messageElement.dataset.temporary = 'true';
-            messageElement.classList.add('thinking'); // Add a class for "thinking" state
+            messageElement.classList.add('thinking');
         }
         chatBox.appendChild(messageElement);
-        chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll to the latest message
+        chatBox.scrollTop = chatBox.scrollHeight;
         return messageElement;
     }
 
@@ -35,14 +40,16 @@ document.addEventListener('DOMContentLoaded', () => {
      */
     function replaceTemporaryMessage(tempElement, newMessage) {
         if (tempElement && tempElement.dataset.temporary === 'true') {
-            tempElement.innerHTML = formatMessageText(newMessage);
-            delete tempElement.dataset.temporary; // Remove the temporary flag
-            tempElement.classList.remove('thinking'); // Remove thinking class
-            // Ensure it retains 'bot' class if it was a bot message
+            const bubble = tempElement.querySelector('.bubble');
+            if (bubble) {
+                bubble.innerHTML = formatMessageText(newMessage);
+            }
+            delete tempElement.dataset.temporary;
+            tempElement.classList.remove('thinking');
             if (!tempElement.classList.contains('bot')) {
                 tempElement.classList.add('bot');
             }
-            chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll
+            chatBox.scrollTop = chatBox.scrollHeight;
         }
     }
 
